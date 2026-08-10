@@ -49,7 +49,7 @@ private struct ConnectionSettings: View {
                 }
             } footer: {
                 Text(preferences.authenticationMethod == .viewerToken
-                     ? "Preferred. Mint one on the server host with `agent-notifications viewer add <label>`, and revoke it there without touching anything else."
+                     ? "Preferred. Mint one on the server host with `agent-notify viewer add <label>`, and revoke it there without touching anything else."
                      : "Works, but this is the credential that administers the server. Prefer a viewer token where you can.")
                     .font(DS.meta).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

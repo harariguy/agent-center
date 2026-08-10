@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Keep Agent Notifications running on your own Mac — the local-mode install.
+  Keep Agent Notify running on your own Mac — the local-mode install.
 
   1. Fill in the two ALL-CAPS placeholders below:
-       BINARY  → the output of `which agent-notifications`
+       BINARY  → the output of `which agent-notify`
        HOME    → your home directory (launchd does not expand ~)
-  2. cp docs/launchd.plist ~/Library/LaunchAgents/ai.tydra.agent-notifications.plist
-  3. launchctl load ~/Library/LaunchAgents/ai.tydra.agent-notifications.plist
+  2. cp docs/launchd.plist ~/Library/LaunchAgents/ai.tydra.agent-notify.plist
+  3. launchctl load ~/Library/LaunchAgents/ai.tydra.agent-notify.plist
 
   The server starts at login, restarts if it exits, binds loopback, and logs to
   ~/Library/Logs. Unload with `launchctl unload` of the same path.
@@ -15,7 +15,7 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>ai.tydra.agent-notifications</string>
+  <string>ai.tydra.agent-notify</string>
 
   <key>ProgramArguments</key>
   <array>
@@ -29,12 +29,12 @@
   <true/>
 
   <key>StandardOutPath</key>
-  <string>HOME/Library/Logs/agent-notifications.log</string>
+  <string>HOME/Library/Logs/agent-notify.log</string>
   <key>StandardErrorPath</key>
-  <string>HOME/Library/Logs/agent-notifications.log</string>
+  <string>HOME/Library/Logs/agent-notify.log</string>
 
   <!-- Optional overrides — defaults are loopback:8765, SQLite in
-       ~/.agent-notifications. Uncomment to change the port:
+       ~/.agent-notify. Uncomment to change the port:
   <key>EnvironmentVariables</key>
   <dict>
     <key>PORT</key>

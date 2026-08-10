@@ -1,4 +1,4 @@
-// Relative times in the Agent Notifications dialect: "now", "5m ago", "yesterday".
+// Relative times in the Agent Notify dialect: "now", "5m ago", "yesterday".
 
 /** API timestamps are UTC, but SQLite hands them back without an offset —
     and `new Date` reads offset-less strings as local time. Pin those to UTC. */

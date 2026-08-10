@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
-// Build straight into the Python package: `agent_notifications.main` serves
+// Build straight into the Python package: `agent_notify.main` serves
 // static/index.html and static/assets/* — no server changes needed per build.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -18,7 +18,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, "../agent_notifications/static"),
+    outDir: path.resolve(__dirname, "../agent_notify/static"),
     emptyOutDir: true,
   },
 })

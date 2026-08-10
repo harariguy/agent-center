@@ -39,7 +39,7 @@ export interface InstallSeed {
   token?: string
 }
 
-/** Connect an agent harness to Agent Notifications.
+/** Connect an agent harness to Agent Notify.
  *
  * One MCP URL plus one bearer header is the whole contract; everything below is
  * packaging per client. The token is the interesting constraint — only its hash

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 export type Theme = "system" | "light" | "dark"
 
-const STORAGE_KEY = "agent-notifications-theme"
+const STORAGE_KEY = "agent-notify-theme"
 const media = window.matchMedia("(prefers-color-scheme: dark)")
 
 function apply(theme: Theme) {

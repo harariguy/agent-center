@@ -33,7 +33,7 @@ export function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
         <Bell className="size-7" />
       </div>
 
-      <h1 className="text-[17px] font-semibold">Agent Notifications</h1>
+      <h1 className="text-[17px] font-semibold">Agent Notify</h1>
 
       <form onSubmit={submit} key={failures} className={failures > 0 ? "animate-login-shake" : undefined}>
         <input

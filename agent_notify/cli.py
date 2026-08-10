@@ -1,12 +1,12 @@
-"""CLI: serve Agent Notifications, register agents, manage viewer tokens.
+"""CLI: serve Agent Notify, register agents, manage viewer tokens.
 
-    agent-notifications serve
-    agent-notifications agent add <name>
-    agent-notifications agent list
-    agent-notifications viewer add <label>
-    agent-notifications viewer list
-    agent-notifications viewer revoke <label>
-    agent-notifications prune
+    agent-notify serve
+    agent-notify agent add <name>
+    agent-notify agent list
+    agent-notify viewer add <label>
+    agent-notify viewer list
+    agent-notify viewer revoke <label>
+    agent-notify prune
 """
 
 from __future__ import annotations
@@ -57,7 +57,7 @@ def _serve(args) -> int:
               f"Something else is probably using the port. Pick another with "
               f"`--port <n>` or `PORT=<n>`.", file=sys.stderr)
         return 1
-    print(f"Agent Notifications → http://{settings.host}:{settings.port}", flush=True)
+    print(f"Agent Notify → http://{settings.host}:{settings.port}", flush=True)
     print(f"database: {settings.database_url}", flush=True)
     uvicorn.run(app, host=settings.host, port=settings.port, log_level="info")
     return 0
@@ -109,7 +109,7 @@ def _agent_list(_args) -> int:
     with make_session_factory(engine)() as db:
         agents = db.scalars(select(Agent).order_by(Agent.created_at)).all()
         if not agents:
-            print("no agents registered — run: agent-notifications agent add <name>")
+            print("no agents registered — run: agent-notify agent add <name>")
             return 0
         for a in agents:
             seen = a.last_seen_at.strftime("%Y-%m-%d %H:%M") if a.last_seen_at else "never"
@@ -176,7 +176,7 @@ def _viewer_list(_args) -> int:
     with _viewer_db()() as db:
         tokens = db.scalars(select(ViewerToken).order_by(ViewerToken.created_at)).all()
         if not tokens:
-            print("no viewer tokens — run: agent-notifications viewer add <label>")
+            print("no viewer tokens — run: agent-notify viewer add <label>")
             return 0
         for t in tokens:
             used = t.last_used_at.strftime("%Y-%m-%d %H:%M") if t.last_used_at else "never"
@@ -202,7 +202,7 @@ def _viewer_revoke(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="agent-notifications",
+    parser = argparse.ArgumentParser(prog="agent-notify",
                                      description="Notification layer for AI agents — they report, you read.")
     sub = parser.add_subparsers(dest="command", required=True)
 

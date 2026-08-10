@@ -1,4 +1,4 @@
-# Agent Notifications
+# Agent Notify
 
 **A self-hostable notification layer for AI agents.** One feed for everything your
 agents did — and everything waiting on you.
@@ -25,7 +25,7 @@ its own channel, not here.
 
 ```
  MCP client ──▶  /mcp  ──────────────┐
-                                     ├──▶  agent-notifications  ──▶  your browser
+                                     ├──▶  agent-notify  ──▶  your browser
  cron / CI  ──▶  POST /api/v1/…  ────┘           │
                                         groups repeats, splits
                                         "activity" from "attention"
@@ -45,24 +45,24 @@ Four things a chat channel can't do:
 ## Quickstart
 
 ```sh
-pip install agent-notifications           # or pipx install agent-notifications
-agent-notifications serve                 # → http://127.0.0.1:8765 (SQLite in ~/.agent-notifications/)
+pipx install git+https://github.com/harariguy/agent-notify
+agent-notify serve                 # → http://127.0.0.1:8765 (SQLite in ~/.agent-notify/)
 ```
 
 If 8765 is taken the server says so and refuses — pick another with
-`agent-notifications serve --port 8766`.
+`agent-notify serve --port 8766`.
 
 Register an agent (in another shell):
 
 ```sh
-agent-notifications agent add my-agent
+agent-notify agent add my-agent
 # prints a bearer token (shown once) and a ready-to-run curl
 ```
 
 Connect a harness — Claude Code, for example:
 
 ```sh
-claude mcp add --transport http agent-notifications http://127.0.0.1:8765/mcp \
+claude mcp add --transport http agent-notify http://127.0.0.1:8765/mcp \
   --scope user --header "Authorization: Bearer <token>"
 ```
 
@@ -109,12 +109,12 @@ same URL. Two rules, enforced rather than suggested:
   in front (see `docker-compose.yml`). Never expose plain HTTP.
 
 Browsers sign in with the password. Browserless readers — a retention cron, the menu
-bar app — use **viewer tokens** (`agent-notifications viewer add cron`, prints once).
+bar app — use **viewer tokens** (`agent-notify viewer add cron`, prints once).
 Viewer tokens read and triage; agent tokens write; neither can manage agents — that
 takes the password session, so a stolen device token can't mint itself a write
 credential.
 
-**Render** — one click: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/harariguy/agent-inbox)
+**Render** — one click: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/harariguy/agent-notify)
 `render.yaml` provisions the service, a disk, and a generated `ADMIN_PASSWORD`
 (read it from Dashboard → Environment). Free-tier variant in the file's comments.
 
@@ -185,7 +185,7 @@ Retries: send an `Idempotency-Key` header and a re-delivery of the same fire cou
 
 | Variable | Default | |
 |---|---|---|
-| `DATABASE_URL` | `sqlite:///~/.agent-notifications/notifications.db` | any SQLAlchemy URL; Postgres via the `[postgres]` extra |
+| `DATABASE_URL` | `sqlite:///~/.agent-notify/notifications.db` | any SQLAlchemy URL; Postgres via the `[postgres]` extra |
 | `HOST` / `PORT` | `127.0.0.1` / `8765` | |
 | `ADMIN_PASSWORD` | *(empty)* | empty = UI open, loopback requests only |
 | `ALLOW_INSECURE_BIND` | *(unset)* | `1` allows a public bind with no password, for tailnets/auth proxies |
@@ -230,19 +230,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for scope, checks, and PR guidance.
 ```sh
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest
-.venv/bin/agent-notifications serve            # → http://127.0.0.1:8765
+.venv/bin/agent-notify serve            # → http://127.0.0.1:8765
 ```
 
 The UI is a React app in `frontend/` (Vite, TypeScript, Tailwind,
 [shadcn/ui](https://ui.shadcn.com), TanStack Query), built into
-`agent_notifications/static/` so the wheel ships it and `pip install` users never
+`agent_notify/static/` so the wheel ships it and `pip install` users never
 touch npm:
 
 ```sh
 cd frontend
 pnpm install
 pnpm dev        # dev server on :5173, proxies /api to :8765
-pnpm build      # emits into agent_notifications/static/
+pnpm build      # emits into agent_notify/static/
 ```
 
 MIT licensed.

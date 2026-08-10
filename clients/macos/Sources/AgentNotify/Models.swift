@@ -1,6 +1,6 @@
 import Foundation
 
-// Wire types — mirror agent_notifications/schemas.py.
+// Wire types — mirror agent_notify/schemas.py.
 
 enum ExternalURL {
     /// Agent-supplied links leave the app, so only ordinary web URLs are safe

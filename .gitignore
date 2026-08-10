@@ -12,7 +12,7 @@ dist/
 *.db
 *.sqlite3
 
-# frontend — source lives in frontend/, the build lands in agent_notifications/static/
+# frontend — source lives in frontend/, the build lands in agent_notify/static/
 # (the wheel still ships static/** via hatch `artifacts`, which ignores gitignore)
 frontend/node_modules/
-agent_notifications/static/
+agent_notify/static/

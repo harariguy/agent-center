@@ -1,4 +1,4 @@
-// Typed client for the Agent Notifications API (/api/v1). Mirrors agent_notifications/schemas.py.
+// Typed client for the Agent Notify API (/api/v1). Mirrors agent_notify/schemas.py.
 
 const API = "/api/v1"
 

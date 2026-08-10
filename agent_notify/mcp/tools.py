@@ -246,7 +246,7 @@ def _list_open(ctx: ToolContext, args: ListIn) -> ToolResult:
         for n in rows
     ]
     if not items:
-        return ToolResult("You have nothing open in Agent Notifications.", {"items": []})
+        return ToolResult("You have nothing open in Agent Notify.", {"items": []})
 
     lines = [
         f"- [{i['group_key'] or 'no key'}] {i['title']} "

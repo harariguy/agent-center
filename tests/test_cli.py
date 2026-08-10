@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import socket
 
-from agent_notifications.cli import main
+from agent_notify.cli import main
 
 
 def test_serve_refuses_taken_port(capsys, monkeypatch):
@@ -21,4 +21,4 @@ def test_serve_refuses_taken_port(capsys, monkeypatch):
     assert "cannot listen" in captured.err
     assert "--port" in captured.err
     # The friendly banner must not print for a server that never came up.
-    assert "Agent Notifications →" not in captured.out
+    assert "Agent Notify →" not in captured.out

@@ -2,13 +2,13 @@ import OSLog
 
 /// Unified-logging channels. Inspect a running copy with:
 ///
-///     log stream --predicate 'subsystem == "ai.tydra.agent-notifications"' --level debug
+///     log stream --predicate 'subsystem == "ai.tydra.agent-notify"' --level debug
 ///
 /// or, for what already happened:
 ///
-///     log show --last 5m --predicate 'subsystem == "ai.tydra.agent-notifications"'
+///     log show --last 5m --predicate 'subsystem == "ai.tydra.agent-notify"'
 enum Log {
-    private static let subsystem = "ai.tydra.agent-notifications"
+    private static let subsystem = "ai.tydra.agent-notify"
 
     static let poll = Logger(subsystem: subsystem, category: "poll")
     static let triage = Logger(subsystem: subsystem, category: "triage")

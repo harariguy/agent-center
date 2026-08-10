@@ -1,4 +1,4 @@
-# Agent Notifications for macOS
+# Agent Notify for macOS
 
 An optional menu bar client. The server does not need it and does not know about
 it — this is one more reader of the same read API, alongside the web UI.
@@ -30,7 +30,7 @@ Then open **Settings** from the `⋯` menu in the panel and fill in:
 - **Viewer token** — mint one on the server host:
 
   ```sh
-  agent-notifications viewer add "macbook"
+  agent-notify viewer add "macbook"
   ```
 
   A viewer token is read + triage only. It cannot post notifications, and you can
@@ -52,7 +52,7 @@ environment at all.
 
 ```sh
 AN_URL="https://notifications.example.com" \
-AN_VIEWER_TOKEN="<token from: agent-notifications viewer add macbook>" \
+AN_VIEWER_TOKEN="<token from: agent-notify viewer add macbook>" \
 make run
 ```
 
@@ -61,7 +61,7 @@ shell's environment. To seed an already-installed copy, invoke the binary
 inside the bundle the same way:
 
 ```sh
-AN_URL=… AN_VIEWER_TOKEN=… "/Applications/Agent Notifications.app/Contents/MacOS/AgentNotifications"
+AN_URL=… AN_VIEWER_TOKEN=… "/Applications/Agent Notify.app/Contents/MacOS/AgentNotify"
 ```
 
 Setting `AN_VIEWER_TOKEN` selects token auth; setting only `AN_ADMIN_PASSWORD`
@@ -139,14 +139,14 @@ unless you ask for both explicitly, which makes an otherwise healthy app look
 silent:
 
 ```sh
-log stream --predicate 'subsystem == "ai.tydra.agent-notifications"' --level debug
-log show --last 5m --predicate 'subsystem == "ai.tydra.agent-notifications"' --info --debug
+log stream --predicate 'subsystem == "ai.tydra.agent-notify"' --level debug
+log show --last 5m --predicate 'subsystem == "ai.tydra.agent-notify"' --info --debug
 ```
 
 ## Layout
 
 ```
-Sources/AgentNotifications/
+Sources/AgentNotify/
   App.swift            MenuBarExtra + settings window + banner handling
   Store.swift          poll loop, notify-on-change, optimistic triage
   APIClient.swift      auth, ETag poll, feed, triage writes

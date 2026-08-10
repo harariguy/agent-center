@@ -5,9 +5,9 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from agent_notifications import main as main_module
-from agent_notifications.config import Settings
-from agent_notifications.main import create_app
+from agent_notify import main as main_module
+from agent_notify.config import Settings
+from agent_notify.main import create_app
 
 
 def make_client(tmp_path, monkeypatch) -> TestClient:

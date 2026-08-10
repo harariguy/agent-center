@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -e ".[dev]"
-      - run: ruff check agent_notifications tests api
+      - run: ruff check agent_notify tests api
       - run: pytest
 
   frontend:

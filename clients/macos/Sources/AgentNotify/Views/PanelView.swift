@@ -259,7 +259,7 @@ struct NotConnectedView: View {
                 .foregroundStyle(.tertiary)
             VStack(spacing: DS.xs) {
                 Text("Not connected").font(.system(size: 13, weight: .medium))
-                Text("Point this at your Agent Notifications server and add a viewer token.")
+                Text("Point this at your Agent Notify server and add a viewer token.")
                     .font(DS.body).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }

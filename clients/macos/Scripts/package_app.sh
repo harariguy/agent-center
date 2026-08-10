@@ -10,7 +10,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 
 CONFIGURATION=${1:-release}
-APP="$ROOT/build/Agent Notifications.app"
+APP="$ROOT/build/Agent Notify.app"
 VERSION="0.1.0"
 BUILD_NUMBER=$(date +%Y%m%d%H%M)
 
@@ -31,7 +31,7 @@ fi
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN_DIR/AgentNotifications" "$APP/Contents/MacOS/AgentNotifications"
+cp "$BIN_DIR/AgentNotify" "$APP/Contents/MacOS/AgentNotify"
 [[ -f "$ROOT/build/AppIcon.icns" ]] && cp "$ROOT/build/AppIcon.icns" "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
@@ -39,10 +39,10 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleExecutable</key><string>AgentNotifications</string>
-  <key>CFBundleIdentifier</key><string>ai.tydra.agent-notifications</string>
-  <key>CFBundleName</key><string>Agent Notifications</string>
-  <key>CFBundleDisplayName</key><string>Agent Notifications</string>
+  <key>CFBundleExecutable</key><string>AgentNotify</string>
+  <key>CFBundleIdentifier</key><string>ai.tydra.agent-notify</string>
+  <key>CFBundleName</key><string>Agent Notify</string>
+  <key>CFBundleDisplayName</key><string>Agent Notify</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>

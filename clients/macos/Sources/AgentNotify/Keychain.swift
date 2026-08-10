@@ -5,7 +5,7 @@ import Security
 /// Credentials live in the login keychain; the server URL and display
 /// preferences are not secrets and stay in UserDefaults.
 enum Keychain {
-    private static let service = "ai.tydra.agent-notifications"
+    private static let service = "ai.tydra.agent-notify"
 
     static func set(_ value: String, account: String) {
         delete(account: account)

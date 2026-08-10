@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-notifications"
+name = "agent-notify"
 version = "0.1.0"
 description = "A self-hostable notification layer for AI agents — they report what they did and what needs you; you read one feed and click out to where the work lives."
 readme = "README.md"
@@ -38,16 +38,16 @@ postgres = [
 ]
 
 [project.scripts]
-agent-notifications = "agent_notifications.cli:main"
+agent-notify = "agent_notify.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/harariguy/agent-inbox"
-Issues = "https://github.com/harariguy/agent-inbox/issues"
+Homepage = "https://github.com/harariguy/agent-notify"
+Issues = "https://github.com/harariguy/agent-notify/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["agent_notifications"]
+packages = ["agent_notify"]
 # The web UI ships pre-built inside the wheel so users never run npm.
-artifacts = ["agent_notifications/static/**"]
+artifacts = ["agent_notify/static/**"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

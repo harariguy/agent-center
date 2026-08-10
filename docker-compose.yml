@@ -1,5 +1,5 @@
 services:
-  agent-notifications:
+  agent-notify:
     build: .
     ports:
       - "8765:8765"
@@ -19,7 +19,7 @@ services:
   # caddy:
   #   image: caddy:2
   #   ports: ["80:80", "443:443"]
-  #   command: caddy reverse-proxy --from notifications.example.com --to agent-notifications:8765
+  #   command: caddy reverse-proxy --from notifications.example.com --to agent-notify:8765
   #   volumes:
   #     - caddy-data:/data
   #   restart: unless-stopped

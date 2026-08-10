@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from agent_notifications.core.retention import prune
-from agent_notifications.db.models import Notification, Occurrence, utcnow
+from agent_notify.core.retention import prune
+from agent_notify.db.models import Notification, Occurrence, utcnow
 
 from .conftest import notify
 
@@ -51,8 +51,8 @@ def test_prune_endpoint(app, client, auth):
 def test_prune_endpoint_requires_viewer_auth():
     from fastapi.testclient import TestClient
 
-    from agent_notifications.config import Settings
-    from agent_notifications.main import create_app
+    from agent_notify.config import Settings
+    from agent_notify.main import create_app
 
     settings = Settings.from_env(database_url="sqlite://", admin_password="x")
     locked = TestClient(create_app(settings))

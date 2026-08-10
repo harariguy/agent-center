@@ -2,7 +2,7 @@
 
 Two gates: reading the roster takes a viewer credential, but everything that
 touches tokens — create, rotate, delete — takes the admin session. Whoever
-owns Agent Notifications decides which agents may write to it, and a viewer
+owns Agent Notify decides which agents may write to it, and a viewer
 token must never be able to promote itself into a write credential."""
 
 from __future__ import annotations
