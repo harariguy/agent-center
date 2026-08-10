@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-notifications"
+version = "0.1.0"
+description = "A self-hostable notification layer for AI agents — they report what they did and what needs you; you read one feed and click out to where the work lives."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+keywords = ["agents", "notifications", "mcp", "ai", "self-hosted"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications",
+]
+dependencies = [
+    "fastapi>=0.111",
+    "uvicorn>=0.30",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "ruff>=0.5",
+]
+postgres = [
+    "psycopg[binary]>=3.1",
+]
+
+[project.scripts]
+agent-notifications = "agent_notifications.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/harariguy/agent-inbox"
+Issues = "https://github.com/harariguy/agent-inbox/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agent_notifications"]
+# The web UI ships pre-built inside the wheel so users never run npm.
+artifacts = ["agent_notifications/static/**"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "C4", "PIE", "RUF"]
+# The UI folds repeats as "×2"; the MCP tool text deliberately matches it.
+allowed-confusables = ["×"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency-injection idiom: calls in argument defaults are the API.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Header", "fastapi.Query"]

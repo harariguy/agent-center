@@ -1,0 +1,185 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   macOS Agent Notifications theme.
+
+   Everything sits on a wallpaper; surfaces are translucent "materials" that
+   blur what's behind them. Colors follow the macOS system palette:
+   SF Blue for the accent, system red/orange for attention states, and
+   label colors expressed as alpha over the material rather than fixed grays.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* system accent + status */
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --card: rgba(255, 255, 255, 0.76);
+  --card-foreground: #1d1d1f;
+  --popover: rgba(250, 250, 250, 0.88);
+  --popover-foreground: #1d1d1f;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(120, 120, 128, 0.12);
+  --secondary-foreground: #1d1d1f;
+  --muted: rgba(120, 120, 128, 0.12);
+  --muted-foreground: rgba(60, 60, 67, 0.62);
+  --accent: rgba(120, 120, 128, 0.16);
+  --accent-foreground: #1d1d1f;
+  --destructive: #ff3b30;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(120, 120, 128, 0.16);
+  --ring: #007aff;
+  --radius: 0.75rem;
+
+  /* macOS extras */
+  --orange: #ff9500;
+  --green: #34c759;
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 2px 10px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  --background: #1c1c1e;
+  --foreground: #f5f5f7;
+  --card: rgba(52, 52, 56, 0.66);
+  --card-foreground: #f5f5f7;
+  --popover: rgba(56, 56, 60, 0.9);
+  --popover-foreground: #f5f5f7;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(120, 120, 128, 0.24);
+  --secondary-foreground: #f5f5f7;
+  --muted: rgba(120, 120, 128, 0.22);
+  --muted-foreground: rgba(235, 235, 245, 0.62);
+  --accent: rgba(120, 120, 128, 0.28);
+  --accent-foreground: #f5f5f7;
+  --destructive: #ff453a;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(120, 120, 128, 0.3);
+  --ring: #0a84ff;
+
+  --orange: #ff9f0a;
+  --green: #30d158;
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.28), 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-orange: var(--orange);
+  --color-green: var(--green);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue",
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* --- materials -------------------------------------------------------------
+   .glass       — notification cards, widgets (regular material)
+   .glass-heavy — menus, dialogs, menu bar (thicker material)             */
+
+@utility glass {
+  background: var(--card);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  backdrop-filter: blur(24px) saturate(130%);
+  border: 0.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+@utility glass-heavy {
+  background: var(--popover);
+  -webkit-backdrop-filter: blur(34px) saturate(150%);
+  backdrop-filter: blur(34px) saturate(150%);
+  border: 0.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* --- wallpaper -------------------------------------------------------------
+   Quiet, static, and desaturated: enough tonal shift for the glass to have
+   something to blur, not enough to compete with the notifications.       */
+
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background:
+    radial-gradient(115% 75% at 12% -5%, rgba(96, 132, 188, 0.1), transparent 62%),
+    radial-gradient(95% 65% at 92% 105%, rgba(172, 148, 132, 0.09), transparent 62%),
+    linear-gradient(180deg, #f4f5f7 0%, #ececeb 100%);
+}
+.dark .wallpaper {
+  background:
+    radial-gradient(115% 75% at 12% -5%, rgba(86, 118, 180, 0.16), transparent 62%),
+    radial-gradient(95% 65% at 92% 105%, rgba(138, 112, 158, 0.12), transparent 62%),
+    linear-gradient(180deg, #17181b 0%, #101113 100%);
+}
+
+/* --- login shake ---------------------------------------------------------- */
+
+@keyframes login-shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}
+.animate-login-shake {
+  animation: login-shake 0.5s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-login-shake {
+    animation: none;
+  }
+}
+
+/* thin, mac-like scrollbars inside the panel */
+.nc-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 25%, transparent) transparent;
+}

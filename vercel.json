@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "corepack enable && cd frontend && pnpm install --frozen-lockfile && pnpm build",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "crons": [
+    { "path": "/api/v1/prune", "schedule": "0 4 * * *" }
+  ]
+}

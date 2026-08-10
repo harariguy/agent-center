@@ -1,0 +1,4 @@
+# pnpm 11+: dependency lifecycle scripts are denied unless listed here.
+# esbuild's postinstall fetches the platform binary Vite needs at build time.
+allowBuilds:
+  esbuild: true

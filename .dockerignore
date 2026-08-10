@@ -1,0 +1,14 @@
+.git
+.venv
+**/__pycache__
+**/*.pyc
+frontend/node_modules
+frontend/dist
+**/.DS_Store
+*.egg-info
+.pytest_cache
+.mypy_cache
+.ruff_cache
+agent_notifications/static
+.env
+.env.*

@@ -1,0 +1,29 @@
+services:
+  agent-notifications:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      # Required on a public bind — the server refuses to start without it.
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      # RETENTION_DAYS: "90"
+      # DATABASE_URL: postgresql+psycopg://...   # defaults to SQLite in /data
+    volumes:
+      - notifications-data:/data
+    restart: unless-stopped
+
+  # TLS on a VPS: uncomment, point your domain at the box, and Caddy fetches
+  # certificates automatically. Managed platforms (Fly, Railway, Render)
+  # terminate TLS for you — skip this there.
+  #
+  # caddy:
+  #   image: caddy:2
+  #   ports: ["80:80", "443:443"]
+  #   command: caddy reverse-proxy --from notifications.example.com --to agent-notifications:8765
+  #   volumes:
+  #     - caddy-data:/data
+  #   restart: unless-stopped
+
+volumes:
+  notifications-data:
+  # caddy-data:
