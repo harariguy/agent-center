@@ -10,7 +10,7 @@
 
 services:
   - type: web
-    name: agent-notify
+    name: agent-center
     runtime: docker           # builds ./Dockerfile — no build/start command needed
     plan: starter             # disks require a paid instance type; free has none
     region: oregon
@@ -20,7 +20,7 @@ services:
     # assume a single instance. Scale the instance, not the count.
     numInstances: 1
 
-    # Must match AGENT_NOTIFY_HOME, which the Dockerfile sets to /data.
+    # Must match AGENT_CENTER_HOME, which the Dockerfile sets to /data.
     # The SQLite database lives here and survives deploys and restarts.
     disk:
       name: data

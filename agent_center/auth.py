@@ -34,7 +34,7 @@ from .errors import problem
 
 TOKEN_PREFIX = "an_"          # agent (write) tokens — greppable in logs and env files
 VIEWER_TOKEN_PREFIX = "anv_"  # viewer (read/triage) tokens
-SESSION_COOKIE = "agent_notify_session"
+SESSION_COOKIE = "agent_center_session"
 SESSION_TTL_SECONDS = 30 * 24 * 3600
 
 
@@ -137,7 +137,7 @@ def require_viewer(request: Request, db: Session = Depends(get_db)) -> None:
     raise problem(401, "Not signed in",
                   "POST /api/v1/session with the admin password, or send "
                   "`Authorization: Bearer <viewer-token>` (created with "
-                  "`agent-notify viewer add`).")
+                  "`agent-center viewer add`).")
 
 
 def require_admin(request: Request) -> None:

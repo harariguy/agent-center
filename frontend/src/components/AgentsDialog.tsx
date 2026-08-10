@@ -18,7 +18,7 @@ import { copyText } from "@/lib/clipboard"
 import { relTime } from "@/lib/time"
 import { cn } from "@/lib/utils"
 
-/** Manage who may post to Agent Notify: register agents, read the one-time
+/** Manage who may post to Agent Center: register agents, read the one-time
     token, revoke access. */
 export function AgentsDialog({
   open,

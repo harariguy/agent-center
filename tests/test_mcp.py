@@ -73,7 +73,7 @@ def test_initialize_echoes_a_known_protocol_and_ships_the_guide(client, auth):
     result = r.json()["result"]
     assert result["protocolVersion"] == "2025-03-26"
     assert result["capabilities"]["tools"] == {"listChanged": False}
-    assert result["serverInfo"]["name"] == "agent-notify"
+    assert result["serverInfo"]["name"] == "agent-center"
     # The usage contract travels with the connection.
     assert "group_key" in result["instructions"]
     assert r.headers["mcp-protocol-version"]
@@ -281,7 +281,7 @@ def test_skill_is_served_with_frontmatter_an_agent_can_install(client):
     assert r.headers["content-type"].startswith("text/markdown")
     body = r.text
     assert body.startswith("---")
-    for field in ("name: agent-notify", "description:", "triggers:"):
+    for field in ("name: agent-center", "description:", "triggers:"):
         assert field in body
 
 

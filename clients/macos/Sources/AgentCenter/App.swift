@@ -3,7 +3,7 @@ import SwiftUI
 import UserNotifications
 
 @main
-struct AgentNotifyApp: App {
+struct AgentCenterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store = Store.shared
 
@@ -19,7 +19,7 @@ struct AgentNotifyApp: App {
         // completely, instead of an NSMenu whose layout belongs to AppKit.
         .menuBarExtraStyle(.window)
 
-        Window("Agent Notify Settings", id: "settings") {
+        Window("Agent Center Settings", id: "settings") {
             SettingsView().environment(store)
         }
         .windowResizability(.contentSize)

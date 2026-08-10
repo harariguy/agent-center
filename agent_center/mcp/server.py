@@ -28,7 +28,7 @@ from ..db.models import Agent
 from ..docs import GUIDE
 from . import tools
 
-log = logging.getLogger("agent_notify.mcp")
+log = logging.getLogger("agent_center.mcp")
 
 router = APIRouter(tags=["mcp"], include_in_schema=False)
 
@@ -39,8 +39,8 @@ SUPPORTED_PROTOCOLS = ("2025-06-18", "2025-03-26", "2024-11-05")
 LATEST_PROTOCOL = SUPPORTED_PROTOCOLS[0]
 
 SERVER_INFO = {
-    "name": "agent-notify",
-    "title": "Agent Notify",
+    "name": "agent-center",
+    "title": "Agent Center",
     "version": __version__,
 }
 
@@ -111,7 +111,7 @@ def _handle(message: dict, ctx: tools.ToolContext) -> dict | None:
             log.exception("mcp tool %s failed", name)
             ctx.db.rollback()
             outcome = tools.ToolResult(
-                f"Agent Notify failed to handle {name}. This is a server-side fault, not a "
+                f"Agent Center failed to handle {name}. This is a server-side fault, not a "
                 f"problem with your arguments; do not retry in a loop.",
                 is_error=True,
             )

@@ -1,9 +1,9 @@
 """Vercel entrypoint (repo-root /api is Vercel's convention; unrelated to the
-agent_notify.api package).
+agent_center.api package).
 
 Module-level construction is deliberate here and only here: Vercel imports
 this at cold start, which is exactly when the app should be built. Everywhere
-else imports stay side-effect free (see agent_notify/main.py).
+else imports stay side-effect free (see agent_center/main.py).
 
 Deployment contract:
 - DATABASE_URL must point at Postgres (Neon's pooled connection string) —
@@ -14,6 +14,6 @@ Deployment contract:
   passes the viewer gate on /api/v1/prune.
 """
 
-from agent_notify.main import create_app
+from agent_center.main import create_app
 
 app = create_app()

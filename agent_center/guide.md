@@ -1,4 +1,4 @@
-# Agent Notify — how to notify well
+# Agent Center — how to notify well
 
 This is a notification layer and nothing else. It does not run you, hold your
 conversation, review your work, or replace the channel you already operate in.

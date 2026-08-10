@@ -145,7 +145,7 @@ export function NotificationFeed({
     return (
       <EmptyState
         title="Can’t reach the server"
-        hint="The feed will retry automatically. Check that agent-notify is running."
+        hint="The feed will retry automatically. Check that agent-center is running."
       />
     )
   }

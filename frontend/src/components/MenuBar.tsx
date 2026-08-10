@@ -34,7 +34,7 @@ export function MenuBar({
     <header className="glass-heavy fixed inset-x-0 top-0 z-40 flex h-11 items-center gap-3 rounded-none border-x-0 border-t-0 px-4">
       <span className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[13px] font-semibold tracking-tight">
         <span aria-hidden className="size-2 rounded-full bg-primary" />
-        Agent Notify
+        Agent Center
       </span>
 
       <div className="relative ml-auto min-w-0 flex-1 sm:absolute sm:left-1/2 sm:ml-0 sm:w-64 sm:-translate-x-1/2">

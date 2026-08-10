@@ -1,5 +1,5 @@
 // The connect-an-agent catalogue: one data structure describing how each
-// harness points at Agent Notify. Pure functions of (url, token, agent name) so
+// harness points at Agent Center. Pure functions of (url, token, agent name) so
 // the install screen stays a renderer and every snippet is inspectable here.
 //
 // Two things every entry shares, because they are the whole contract: the MCP
@@ -52,8 +52,8 @@ export function buildContext(
 /** Known skill directories. A harness decides what to do by scanning its skill
     index before it acts, so this is where "notify unprompted" has to live. */
 const SKILL_PATHS = [
-  ["Claude Code", "~/.claude/skills/agent-notify/SKILL.md"],
-  ["Hermes", "~/.hermes/skills/productivity/agent-notify/SKILL.md"],
+  ["Claude Code", "~/.claude/skills/agent-center/SKILL.md"],
+  ["Hermes", "~/.hermes/skills/productivity/agent-center/SKILL.md"],
 ] as const
 
 /** The step that turns notifying from a request into a habit.
@@ -111,7 +111,7 @@ function bearer(ctx: InstallContext) {
 function mcpServersJson(ctx: InstallContext) {
   return `{
   "mcpServers": {
-    "agent-notify": {
+    "agent-center": {
       "type": "http",
       "url": "${ctx.mcpUrl}",
       "headers": {
@@ -126,7 +126,7 @@ function mcpServersJson(ctx: InstallContext) {
 function vscodeJson(ctx: InstallContext) {
   return `{
   "servers": {
-    "agent-notify": {
+    "agent-center": {
       "type": "http",
       "url": "${ctx.mcpUrl}",
       "headers": {
@@ -141,7 +141,7 @@ function vscodeJson(ctx: InstallContext) {
     own config or call HTTP. Carries the credentials, the tool names, and a
     pointer at the served guide rather than a copy of it. */
 export function installPrompt(ctx: InstallContext): string {
-  return `Please connect yourself to my Agent Notify so you can send me notifications.
+  return `Please connect yourself to my Agent Center so you can send me notifications.
 
 This is a notification layer only. It does not change how you work, it is not a
 channel anyone replies through, and nothing waits on it — you just report what you
@@ -149,7 +149,7 @@ did and what needs me.
 
 1. Add this MCP server to your configuration:
    - transport: streamable HTTP
-   - name: agent-notify
+   - name: agent-center
    - url: ${ctx.mcpUrl}
    - header: ${AUTH_HEADER}: ${bearer(ctx)}
 
@@ -166,8 +166,8 @@ did and what needs me.
    actually stopped.
 
 4. Fetch ${ctx.skillUrl} and install it as a skill in your own skill directory
-   (e.g. ~/.claude/skills/agent-notify/SKILL.md or
-   ~/.hermes/skills/productivity/agent-notify/SKILL.md). This is the step
+   (e.g. ~/.claude/skills/agent-center/SKILL.md or
+   ~/.hermes/skills/productivity/agent-center/SKILL.md). This is the step
    that makes you report on your own instead of waiting to be asked, so do not
    skip it, and keep the frontmatter's description and triggers intact.
 
@@ -186,7 +186,7 @@ export const CLIENTS: InstallClient[] = [
         title: "Add the server",
         detail: "One command. Adding --scope user makes it available in every project.",
         codeLabel: "Terminal",
-        code: `claude mcp add --transport http agent-notify ${ctx.mcpUrl} \\
+        code: `claude mcp add --transport http agent-center ${ctx.mcpUrl} \\
   --scope user \\
   --header "${AUTH_HEADER}: ${bearer(ctx)}"`,
       },
@@ -199,7 +199,7 @@ export const CLIENTS: InstallClient[] = [
         title: "Try it",
         detail: "Ask Claude to notify you; the card should appear in this feed.",
         codeLabel: "Prompt",
-        code: 'Use agent-notify to tell me you are connected.',
+        code: 'Use agent-center to tell me you are connected.',
       },
     ],
   },

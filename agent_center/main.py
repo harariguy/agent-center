@@ -24,7 +24,7 @@ from .docs import GUIDE, skill
 from .errors import PROBLEM_TYPE, install_handlers
 from .mcp import router as mcp_router
 
-log = logging.getLogger("agent_notify")
+log = logging.getLogger("agent_center")
 
 STATIC_DIR = Path(__file__).parent / "static"
 
@@ -109,7 +109,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         task.cancel()
 
     app = FastAPI(
-        title="Agent Notify",
+        title="Agent Center",
         version="0.1.0",
         description="A notification-only layer for AI agents: they report, you read and "
                     "click out. It does not run agents, hold conversations, or replace "
@@ -228,4 +228,4 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 # No module-level `app = create_app()`: constructing the app touches the
 # filesystem (SQLite home dir), and imports must stay side-effect free — tests
 # build their own apps against in-memory databases. For raw uvicorn use:
-#   uvicorn agent_notify.main:create_app --factory
+#   uvicorn agent_center.main:create_app --factory

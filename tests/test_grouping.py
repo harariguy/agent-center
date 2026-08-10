@@ -1,6 +1,6 @@
 """The fingerprint: volatile tokens must not split a group."""
 
-from agent_notify.core.grouping import fingerprint, normalise
+from agent_center.core.grouping import fingerprint, normalise
 
 
 def test_numbers_and_amounts_are_volatile():

@@ -1,7 +1,7 @@
 ---
-name: agent-notify
-description: "Report to the user's self-hosted Agent Notify server — what you did, and what needs them. Use it unprompted: after you create, ship, merge, file, or send anything; when you stop because you need a decision; when a scheduled or background run finishes or fails. NOT the macOS Notification Center."
-tags: [notifications, reporting, handoff, standup, mcp, agent-notify]
+name: agent-center
+description: "Report to the user's self-hosted Agent Center server — what you did, and what needs them. Use it unprompted: after you create, ship, merge, file, or send anything; when you stop because you need a decision; when a scheduled or background run finishes or fails. NOT the macOS Notification Center."
+tags: [notifications, reporting, handoff, standup, mcp, agent-center]
 triggers:
   - you created, shipped, merged, filed, or sent something the user would want to know about
   - you finished a task whose result lives somewhere other than this conversation
@@ -11,11 +11,11 @@ triggers:
   - the user asks what their agents have been doing
 ---
 
-# Agent Notify
+# Agent Center
 
 The user runs a small self-hosted server that collects what their agents have done
 and what is waiting on them. It is the one place they look instead of checking
-twelve. Registered as the `agent-notify` MCP server.
+twelve. Registered as the `agent-center` MCP server.
 
 **This is not the macOS Notification Center.** Never use `osascript`,
 `display notification`, `notify-send`, or any desktop toast to satisfy this — those

@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from agent_notify.config import Settings
-from agent_notify.main import create_app
+from agent_center.config import Settings
+from agent_center.main import create_app
 
 
 @pytest.fixture()

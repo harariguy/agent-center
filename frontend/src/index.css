@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ---------------------------------------------------------------------------
-   macOS Agent Notify theme.
+   macOS Agent Center theme.
 
    Everything sits on a wallpaper; surfaces are translucent "materials" that
    blur what's behind them. Colors follow the macOS system palette:

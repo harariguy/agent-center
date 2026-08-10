@@ -9,6 +9,6 @@ frontend/dist
 .pytest_cache
 .mypy_cache
 .ruff_cache
-agent_notify/static
+agent_center/static
 .env
 .env.*

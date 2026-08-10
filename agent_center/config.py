@@ -11,7 +11,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_HOME = Path.home() / ".agent-notify"
+DEFAULT_HOME = Path.home() / ".agent-center"
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,7 @@ class Settings:
 
     @classmethod
     def from_env(cls, **overrides) -> Settings:
-        home = Path(os.environ.get("AGENT_NOTIFY_HOME", DEFAULT_HOME))
+        home = Path(os.environ.get("AGENT_CENTER_HOME", DEFAULT_HOME))
         values = {
             "database_url": os.environ.get(
                 "DATABASE_URL", f"sqlite:///{home / 'notifications.db'}"

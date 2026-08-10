@@ -13,16 +13,16 @@ import time
 import pytest
 from fastapi.testclient import TestClient
 
-from agent_notify.auth import (
+from agent_center.auth import (
     SESSION_COOKIE,
     VIEWER_TOKEN_PREFIX,
     _session_signature,
     generate_token,
     hash_token,
 )
-from agent_notify.config import Settings
-from agent_notify.db.models import ViewerToken
-from agent_notify.main import create_app
+from agent_center.config import Settings
+from agent_center.db.models import ViewerToken
+from agent_center.main import create_app
 
 PASSWORD = "hunter2"
 
