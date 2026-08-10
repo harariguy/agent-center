@@ -44,10 +44,25 @@ agent-center = "agent_center.cli:main"
 Homepage = "https://github.com/harariguy/agent-center"
 Issues = "https://github.com/harariguy/agent-center/issues"
 
+# The web UI ships pre-built so users never run npm. It is gitignored, and
+# `artifacts` is the override — declared here rather than on the wheel target
+# because `python -m build` builds the wheel from the sdist, so a wheel-only
+# declaration yields a wheel with no UI in it.
+[tool.hatch.build]
+artifacts = ["agent_center/static/**"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["agent_center"]
-# The web UI ships pre-built inside the wheel so users never run npm.
-artifacts = ["agent_center/static/**"]
+
+[tool.hatch.build.targets.sdist]
+# hatchling reads only the root .gitignore, so the Swift client's nested
+# ignore of .build/ does not apply and its output would otherwise be swept in.
+exclude = [
+    "clients/macos/.build",
+    "clients/macos/.swiftpm",
+    "frontend/node_modules",
+    ".venv",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
