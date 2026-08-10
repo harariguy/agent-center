@@ -3,7 +3,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-center"
+# The distribution name carries an -app suffix because PyPI refuses names that
+# differ from an existing project only by separators, and `agentcenter` is
+# taken. Everything else — the import package, the command, the repo — is
+# agent-center.
+name = "agent-center-app"
 version = "0.1.0"
 description = "A self-hostable notification layer for AI agents — they report what they did and what needs you; you read one feed and click out to where the work lives."
 readme = "README.md"

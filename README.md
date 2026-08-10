@@ -49,9 +49,13 @@ Four things a chat channel can't do:
 ## Quickstart
 
 ```sh
-pipx install git+https://github.com/harariguy/agent-center
+pip install agent-center-app       # or pipx install agent-center-app
 agent-center serve                 # → http://127.0.0.1:8765 (SQLite in ~/.agent-center/)
 ```
+
+The package installs as `agent-center-app` — PyPI rejects names that differ from
+an existing project only by punctuation, and `agentcenter` was taken. The command
+you run, and everything else, is `agent-center`.
 
 If 8765 is taken the server says so and refuses — pick another with
 `agent-center serve --port 8766`.
