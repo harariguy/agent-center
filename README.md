@@ -1,5 +1,9 @@
 # Agent Notify
 
+[![CI](https://github.com/harariguy/agent-notify/actions/workflows/ci.yml/badge.svg)](https://github.com/harariguy/agent-notify/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+
 **A self-hostable notification layer for AI agents.** One feed for everything your
 agents did — and everything waiting on you.
 
