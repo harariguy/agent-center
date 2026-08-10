@@ -107,7 +107,7 @@ paths per its comments, copy it to `~/Library/LaunchAgents/`, `launchctl load` i
 ## Hosting it
 
 Run the server on something always-on and your browser and remote agents reach the
-same URL. Two rules, enforced rather than suggested:
+same URL. Three rules, enforced rather than suggested:
 
 - **`ADMIN_PASSWORD` is required.** On a non-loopback bind (or Vercel) the server
   refuses to start without it — and a passwordless server answers loopback peers
@@ -115,6 +115,7 @@ same URL. Two rules, enforced rather than suggested:
   tailnet or authenticating proxy.
 - **TLS is the platform's job.** Managed platforms terminate it; on a VPS put Caddy
   in front (see `docker-compose.yml`). Never expose plain HTTP.
+- **Run exactly one instance.** The rate limiter and the background retention loop live in the process memory, not the database. If you scale to multiple replicas behind a load balancer, rate limits will be silently incorrect and background jobs will race. Scale the box, not the process count.
 
 Browsers sign in with the password. Browserless readers — a retention cron, the menu
 bar app — use **viewer tokens** (`agent-center viewer add cron`, prints once).
