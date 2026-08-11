@@ -143,6 +143,12 @@ final class Store {
     }
 
     private var currentInterval: Int {
+        // Demo escape hatch: a fixed cadence below the 10s floor, ignoring the
+        // panel-open and Low Power adjustments so the interval is predictable.
+        if let raw = ProcessInfo.processInfo.environment["AN_POLL_INTERVAL"],
+           let seconds = Int(raw), seconds > 0 {
+            return seconds
+        }
         let base = max(10, preferences.pollInterval)
         if isPanelOpen { return max(8, base / 2) }
         if ProcessInfo.processInfo.isLowPowerModeEnabled { return base * 3 }
@@ -233,7 +239,11 @@ final class Store {
         }
         guard seeded else { return }
 
-        for item in fetched where item.isUnread {
+        // The feed is newest-first, and the notifier posts in the order it is
+        // handed items — so walk it backwards. The newest banner is then the
+        // last to arrive and sits at the top of the stack, the way every other
+        // notification on the system does.
+        for item in fetched.reversed() where item.isUnread {
             if !item.needsYou && !preferences.notifyOnActivity { continue }
             if let previous = seenLastFire[item.id] {
                 if item.lastSeenAt > previous { notifier.post(item) }
