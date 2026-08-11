@@ -143,6 +143,12 @@ final class Store {
     }
 
     private var currentInterval: Int {
+        // Demo escape hatch: a fixed cadence below the 10s floor, ignoring the
+        // panel-open and Low Power adjustments so the interval is predictable.
+        if let raw = ProcessInfo.processInfo.environment["AN_POLL_INTERVAL"],
+           let seconds = Int(raw), seconds > 0 {
+            return seconds
+        }
         let base = max(10, preferences.pollInterval)
         if isPanelOpen { return max(8, base / 2) }
         if ProcessInfo.processInfo.isLowPowerModeEnabled { return base * 3 }
