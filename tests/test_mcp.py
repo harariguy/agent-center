@@ -330,3 +330,17 @@ def test_non_web_link_is_a_readable_tool_error(client, auth):
         "actions": [{"label": "Open", "url": "data:text/html,hi"}],
     }).json()["result"]
     assert result["isError"] is True
+
+
+def test_tool_name_in_type_comes_back_as_a_fixable_tool_error(client, auth):
+    """Caught at argument validation, not inside the handler.
+
+    `NotificationIn` enforces this too, but that model is built past the point
+    where a ValidationError still becomes something the model can read — so the
+    facade has to carry the same rule.
+    """
+    r = call_tool(client, auth, "report_activity", {**ACTIVITY, "type": "request_input"})
+    result = r.json()["result"]
+    assert result["isError"] is True
+    text = json.dumps(result["content"])
+    assert "category" in text and "input.needed" in text

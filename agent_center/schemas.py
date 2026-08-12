@@ -14,6 +14,30 @@ Priority = Literal["min", "low", "normal", "high", "urgent"]
 # Namespaced event names: "pr.opened", "job.failed", "input.needed".
 TYPE_PATTERN = r"^[a-z0-9_]+(\.[a-z0-9_]+)*$"
 
+# The MCP write tools, which are also the two names an agent reaching for the
+# wire format is most likely to put in `type`.
+RESERVED_TYPES = {"report_activity", "request_input"}
+
+
+def validate_event_type(value: str) -> str:
+    """Reject a tool name sitting in the `type` field.
+
+    On the MCP surface the tool *is* the category, so an agent that drops down
+    to `POST /notifications` reasonably assumes `type: "request_input"` routes
+    the same way. It does not — `category` routes, `type` only labels — so the
+    ask lands in Activity with nothing to show it was meant to block. The two
+    fields never disagree loudly enough to notice, so the contradiction dies at
+    the door instead: this is the one mistake the split cannot survive.
+    """
+    if value in RESERVED_TYPES:
+        raise ValueError(
+            f"'{value}' is a tool name, not an event type. `type` labels what "
+            "happened (input.needed, pr.opened, job.failed); `category` chooses "
+            "the feed — 'attention' if you have stopped and need the human, "
+            "'activity' otherwise."
+        )
+    return value
+
 
 def require_web_url(value: str) -> str:
     """Only absolute http(s) URLs may enter the system as links.
@@ -57,16 +81,35 @@ class ActionIn(Action):
 
 
 class NotificationIn(BaseModel):
-    type: str = Field(pattern=TYPE_PATTERN, max_length=100)
+    type: str = Field(
+        pattern=TYPE_PATTERN, max_length=100,
+        description="Namespaced event name, lowercase dotted: pr.opened, job.failed, "
+                    "input.needed. Labels what happened; it does NOT route — see "
+                    "`category` for that.",
+    )
     title: str = Field(min_length=1, max_length=300)
     body: str = Field(default="", max_length=4000)
-    category: Category = "activity"
-    priority: Priority = "normal"
+    category: Category = Field(
+        default="activity",
+        description="Which feed this lands in. 'attention' means you have stopped and "
+                    "cannot continue without the human; 'activity' is everything else. "
+                    "This is the only field that decides it.",
+    )
+    priority: Priority = Field(
+        default="normal",
+        description="How loud, independent of `category`. A high-priority activity item "
+                    "is normal — urgency and blocking are different questions.",
+    )
     group_key: str | None = Field(default=None, max_length=200)
     source: Source | None = None
     actions: list[ActionIn] = Field(default_factory=list, max_length=5)
     tags: list[str] = Field(default_factory=list, max_length=10)
     metadata: dict = Field(default_factory=dict)
+
+    @field_validator("type")
+    @classmethod
+    def _type_is_not_a_route(cls, v: str) -> str:
+        return validate_event_type(v)
 
 
 class NotificationOut(BaseModel):

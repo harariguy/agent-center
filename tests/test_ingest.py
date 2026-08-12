@@ -118,3 +118,44 @@ def test_web_urls_accepted(client, auth):
                source={"app": "linear", "link": "https://linear.app/acme/issue/PROJ-1"},
                actions=[{"label": "Open", "url": "http://127.0.0.1:8765/x"}])
     assert r.status_code == 201
+
+
+# --- category is the only route -------------------------------------------------
+#
+# On MCP the tool name carries the split, so an agent dropping to the wire format
+# reasonably assumes `type: "request_input"` does the same. It does not: `category`
+# routes and defaults to activity, so a blocking ask lands in the wrong feed with
+# nothing on it to show what it was meant to be.
+
+
+def test_tool_name_in_type_is_rejected(client, auth):
+    for bad in ("request_input", "report_activity"):
+        r = notify(client, auth, type=bad, category="activity")
+        assert r.status_code == 422, bad
+        # The error has to name the field the agent actually wanted.
+        assert "category" in r.text
+
+
+def test_the_rejection_names_a_usable_replacement(client, auth):
+    r = notify(client, auth, type="request_input")
+    assert "input.needed" in r.text
+
+
+def test_event_names_that_merely_contain_a_tool_name_are_fine(client, auth):
+    for ok in ("input.needed", "request_input.sent", "agent.request_input"):
+        assert notify(client, auth, type=ok, group_key=ok).status_code == 201
+
+
+def test_category_still_defaults_to_activity(client, auth):
+    """Omitted, not null — the default is what makes the mis-file silent."""
+    r = client.post("/api/v1/notifications", headers=auth,
+                    json={"type": "job.finished", "title": "Nightly reconcile passed"})
+    assert r.status_code == 201
+    assert r.json()["category"] == "activity"
+
+
+def test_high_priority_does_not_imply_attention(client, auth):
+    """The two axes are independent — the whole point of the split."""
+    r = notify(client, auth, type="job.failed", category="activity", priority="high")
+    assert r.json()["category"] == "activity"
+    assert r.json()["priority"] == "high"

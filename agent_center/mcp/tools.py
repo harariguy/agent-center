@@ -41,6 +41,7 @@ from ..schemas import (
     Priority,
     Source,
     require_web_url,
+    validate_event_type,
 )
 
 # --- tool inputs ---------------------------------------------------------------
@@ -63,8 +64,10 @@ class WriteIn(BaseModel):
     type: str = Field(
         pattern=TYPE_PATTERN, max_length=100,
         description="Namespaced event name, lowercase dotted: pr.opened, job.failed, "
-                    "ticket.created, input.needed. Reuse existing names rather than "
-                    "coining variants — each distinct value becomes a filter.",
+                    "ticket.created, input.needed. Name the event, never the tool you "
+                    "are calling — this field labels, it does not route. Reuse existing "
+                    "names rather than coining variants — each distinct value becomes "
+                    "a filter.",
     )
     body: str = Field(
         default="", max_length=4000,
@@ -109,6 +112,14 @@ class WriteIn(BaseModel):
     @classmethod
     def _link_is_web(cls, v: str | None) -> str | None:
         return None if v is None else require_web_url(v)
+
+    # Same reason: `NotificationIn` enforces this too, but that model is built
+    # inside the handler, past the point where a ValidationError still becomes
+    # a tool error the model can read and correct.
+    @field_validator("type")
+    @classmethod
+    def _type_is_not_a_route(cls, v: str) -> str:
+        return validate_event_type(v)
 
 
 class ListIn(BaseModel):
