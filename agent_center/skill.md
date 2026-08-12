@@ -37,8 +37,12 @@ per *outcome*, not per step.
 | `list_open_notifications` | Before filing, to reuse an existing `group_key`. |
 | `resolve_notification` | Something you filed no longer needs them. |
 
-If those tools are not bound in your tool list, POST the same fields to
-`{base}/api/v1/notifications` with your bearer token — it is the same write path.
+If those tools are not bound in your tool list, POST to
+`{base}/api/v1/notifications` with your bearer token. Same write path, with one
+difference that matters: no tool name means nothing carries the split for you.
+Send `"category": "attention"` yourself for anything you are blocked on — it
+defaults to `"activity"`. Putting `request_input` in `type` does not route it;
+that field is an event label, and the server rejects that particular value.
 
 ## The four rules that matter
 
@@ -49,9 +53,11 @@ Fetch `{base}/api/v1/guide.md` once and follow it. The short version:
   key fold into one entry with a count instead of spamming.
 - **A complete snapshot every time** — a grouped re-fire *replaces* the title and
   body, so never write "still blocked" or "update: fixed two of them".
-- **`request_input` only when you actually stopped** — and say in the body where
-  you are waiting, because nobody replies inside a notification. The user answers
-  you in your own channel.
+- **`request_input` only when you actually stopped** — over HTTP, that is
+  `"category": "attention"`. Say in the body where you are waiting, because
+  nobody replies inside a notification; the user answers you in your own channel.
+  Priority is a separate axis: `high` does not put anything in "Needs you", so
+  never reach for it instead of the category.
 - **Link out** — set `source_app` and `source_link` to where the work actually
   lives. A notification with nowhere to click is a dead end.
 

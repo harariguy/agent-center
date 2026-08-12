@@ -43,6 +43,27 @@ noticed, jobs that ran — is `report_activity`. The feed separates "waiting on
 you" from "for your information", and the moment routine output arrives as
 `request_input` that split stops meaning anything.
 
+**Over HTTP the field is `category`.** There is no tool name to carry the split
+there, and it defaults to `activity` — so a blocking ask sent without it lands
+in the wrong feed, silently, with nothing on the entry to show it was meant to
+stop you:
+
+| You are | MCP tool | HTTP field |
+|---|---|---|
+| stopped, need an answer | `request_input` | `"category": "attention"` |
+| reporting, not blocked | `report_activity` | `"category": "activity"` |
+
+`type` labels the event; it routes nothing. `type: "request_input"` files an ask
+as activity, so the server rejects that value rather than accept the
+contradiction — name the event instead (`input.needed`).
+
+**Priority is a separate axis from all of this.** `high` does not mean "needs
+you", and an attention item does not have to be `high`. A failed nightly job is
+high-priority *activity* — loud, but nothing waits on the human. A one-line
+question you are blocked on is often normal-priority *attention*. Never reach
+for `high` to make something feel urgent enough to land in "Needs you"; it does
+not move it there, and it spends the priority scale on the wrong thing.
+
 Because nothing here is a reply channel, say in the body where the answer should
 go: the thread you are blocked in, the session to resume, the issue to comment
 on. A question with nowhere to answer it is a dead end.
