@@ -45,7 +45,9 @@ struct PanelView: View {
 
     private var feed: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: DS.md, pinnedViews: [.sectionHeaders]) {
+            // Headers scroll with the feed rather than pinning: without a fill
+            // behind them, a pinned label would have cards sliding through it.
+            LazyVStack(alignment: .leading, spacing: DS.md) {
                 ForEach(sections, id: \.heading) { section in
                     Section {
                         ForEach(section.items) { item in
@@ -53,12 +55,7 @@ struct PanelView: View {
                                 .transition(.opacity.combined(with: .move(edge: .leading)))
                         }
                     } header: {
-                        Text(section.heading.uppercased())
-                            .font(DS.sectionHeader)
-                            .foregroundStyle(.tertiary)
-                            .padding(.vertical, DS.xs)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(.background.opacity(0.92))
+                        DayHeader(heading: section.heading)
                     }
                 }
             }
@@ -89,6 +86,32 @@ struct PanelView: View {
     private func openSettings() {
         NSApp.activate(ignoringOtherApps: true)
         openWindow(id: "settings")
+    }
+}
+
+// MARK: - day marker
+
+/// Day separator: an unfilled label on a rule. No background of its own — it
+/// sits on the panel like the cards do, borrows the card border's hairline for
+/// the rule, and reads at `.secondary` so the day is legible rather than a
+/// faint smudge. Aligned to the same gutter as the cards below it.
+private struct DayHeader: View {
+    let heading: String
+
+    var body: some View {
+        HStack(spacing: DS.sm) {
+            Text(heading.uppercased())
+                .font(DS.sectionHeader)
+                .kerning(0.5)
+                .foregroundStyle(.secondary)
+
+            Rectangle()
+                .fill(DS.border(hovered: false))
+                .frame(height: 1)
+        }
+        .padding(.top, DS.xs)
+        .padding(.bottom, 2)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
