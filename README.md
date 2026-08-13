@@ -1,4 +1,6 @@
-# Agent Center
+<p align="left">
+  <img src="brand/assets/lockup-horizontal.svg" alt="Agent Center" width="248">
+</p>
 
 [![CI](https://github.com/harariguy/agent-center/actions/workflows/ci.yml/badge.svg)](https://github.com/harariguy/agent-center/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agent-center-app.svg)](https://pypi.org/project/agent-center-app/)
@@ -254,4 +256,4 @@ pnpm dev        # dev server on :5173, proxies /api to :8765
 pnpm build      # emits into agent_center/static/
 ```
 
-MIT licensed.
+MIT licensed. Brand assets and usage notes live in [`brand/`](brand/).

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="248" height="40" viewBox="0 0 248 40" fill="none">
+  <g transform="translate(0 4)">
+    <path d="M4 6.5h20" stroke="#2F6BFF" stroke-width="3.6" stroke-linecap="round"></path>
+    <path d="M10 14h18M10 20.5h18M10 27h18" stroke="#1D1D1F" stroke-width="3.2" stroke-linecap="round" opacity="0.42"></path>
+  </g>
+  <text x="44" y="27" font-family="Archivo, &#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif" font-size="25" font-weight="600" letter-spacing="-0.5" fill="#1D1D1F">Agent Center</text>
+</svg>
