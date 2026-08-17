@@ -1,0 +1,3 @@
+# For Vercel's Python builder, which installs from requirements.txt.
+# Everyone else: pip install agent-center  (or ".[postgres]").
+.[postgres]

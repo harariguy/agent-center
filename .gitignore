@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!.env.example
+dist/
+*.egg-info/
+.pytest_cache/
+
+# local databases
+*.db
+*.sqlite3
+
+# frontend — source lives in frontend/, the build lands in agent_center/static/
+# (the wheel still ships static/** via hatch `artifacts`, which ignores gitignore)
+frontend/node_modules/
+agent_center/static/
+
+# hyperframes video workspace (local only)
+video/
+
+# macOS
+.DS_Store

@@ -1,0 +1,77 @@
+name: Publish
+
+# Publishes to PyPI via trusted publishing: PyPI verifies a short-lived OIDC
+# token minted for this workflow, so no API token exists to leak or rotate.
+# Configure the publisher at https://pypi.org/manage/project/agent-center-app/settings/publishing/
+# (owner: harariguy, repo: agent-center, workflow: publish.yml, environment: pypi).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The wheel ships the built UI, so the frontend must exist before the
+      # Python build runs — a wheel packaged without it serves no feed at all.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm build
+        working-directory: frontend
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - run: python -m build
+
+      # Guard the failure mode that is invisible until a user installs: the
+      # UI is gitignored, so any regression in the artifacts config yields a
+      # wheel that imports fine and serves nothing. Fail here instead.
+      - name: Verify the wheel ships the UI
+        run: |
+          python - <<'PY'
+          import glob, sys, zipfile
+          wheel = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(wheel).namelist()
+          missing = [p for p in ("agent_center/static/index.html",) if p not in names]
+          assets = [n for n in names if n.startswith("agent_center/static/assets/")]
+          if missing or not assets:
+              sys.exit(f"{wheel} is missing the built UI: {missing or 'no assets/'}")
+          print(f"{wheel}: index.html + {len(assets)} asset(s)")
+          PY
+      - run: twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Gate the release on a named environment so the PyPI publisher can be
+    # scoped to it, and approvals can be required later without touching this.
+    environment:
+      name: pypi
+      url: https://pypi.org/p/agent-center-app
+    permissions:
+      id-token: write # mint the OIDC token PyPI checks; nothing else is granted
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

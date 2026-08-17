@@ -1,0 +1,61 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy: Render Dashboard → New → Blueprint → pick this repo.
+# Everything below is provisioned in one step; the only thing you do by hand
+# afterwards is read the generated ADMIN_PASSWORD out of the dashboard.
+#
+# This blueprint uses SQLite on a persistent disk — no database to manage.
+# For the free tier (which cannot have disks) see the commented variant at the
+# bottom of this file.
+
+services:
+  - type: web
+    name: agent-center
+    runtime: docker           # builds ./Dockerfile — no build/start command needed
+    plan: starter             # disks require a paid instance type; free has none
+    region: oregon
+    healthCheckPath: /api/v1/healthz
+
+    # One process, one worker: SQLite and the in-process rate limiter both
+    # assume a single instance. Scale the instance, not the count.
+    numInstances: 1
+
+    # Must match AGENT_CENTER_HOME, which the Dockerfile sets to /data.
+    # The SQLite database lives here and survives deploys and restarts.
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+
+    envVars:
+      # Required. Without it the server refuses to start, by design — the
+      # service is publicly reachable. Render generates a strong value;
+      # read it from Dashboard → Environment to sign in the first time.
+      - key: ADMIN_PASSWORD
+        generateValue: true
+
+      # Notifications unseen this long are pruned by the in-process daily
+      # loop. Render runs a long-lived container, so no cron service is needed.
+      - key: RETENTION_DAYS
+        value: "90"
+
+      # Do NOT set HOST or PORT here. The Dockerfile binds 0.0.0.0 and Render
+      # injects its own PORT, which the app reads from the environment.
+
+# --- Free-tier variant (no disk, external Postgres) --------------------------
+#
+# Free services have an ephemeral filesystem, so SQLite would be wiped on every
+# restart. Point at Neon (or any Postgres) instead: delete the `disk:` block
+# above, set `plan: free`, and add this env var. `sync: false` makes Render
+# prompt you for the value at deploy time instead of storing it in git.
+#
+#      - key: DATABASE_URL
+#        sync: false
+#
+# The connection string must name the driver — psycopg3 is what ships in the
+# image, so rewrite Neon's `postgres://` prefix to `postgresql+psycopg://`.
+# A bare `postgresql://` fails at startup looking for psycopg2.
+#
+# Note: free services spin down after ~15 minutes idle. An incoming
+# notification wakes the service rather than being lost, but the agent's
+# request waits out a cold start of roughly 30-60 seconds.
