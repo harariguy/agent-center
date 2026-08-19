@@ -157,6 +157,29 @@ is one it defaults through. The full field rules live in one markdown file serve
 `GET /api/v1/guide.md` and as the MCP `initialize` instructions, so no harness keeps
 a copy that can go stale.
 
+## Let the agent install itself
+
+Most connections aren't configured by hand — you hand the agent one prompt and it
+does its own setup. **Connect an agent** in the UI mints a per-agent token and
+renders that prompt (plus by-hand steps per client). Pasted at the agent, it:
+
+1. adds the MCP server to its own config (or falls back to plain HTTP),
+2. reads the field rules at `/api/v1/guide.md`,
+3. installs the skill from `/api/v1/skill.md` into its own skill directory,
+4. on Hermes, installs the session hook from `/api/v1/hooks/hermes/` (see below),
+5. confirms by sending a `setup-check` card you watch land in the feed.
+
+Everything an agent needs to bootstrap itself is served ungated as plain text, so
+this also works headless — point any agent at the URLs directly:
+
+| URL | What it is |
+|---|---|
+| `GET /api/v1/guide.md` | The field rules (same text as the MCP `initialize` instructions) |
+| `GET /api/v1/skill.md` | The installable skill, URLs pre-resolved to this server |
+| `GET /api/v1/hooks/hermes/plugin.py` + `plugin.yaml` | The Hermes session hook |
+
+None of these carry secrets — the agent's token lives only in its own MCP config.
+
 ## Why MCP alone isn't enough — the skill
 
 An `mcp_servers` entry means an agent *can* notify, not that it will. Harnesses
@@ -178,6 +201,48 @@ triggers:
 
 (It also tells agents not to satisfy "notify me" with `osascript` or `notify-send` —
 a desktop toast that nothing collects.)
+
+## Guaranteeing the policy is heard — the Hermes session hook
+
+The skill has one weakness left: it reaches the model only when the harness's
+skill scan surfaces it. A session where that pass misses runs with no notify
+policy in context at all — and the sessions most at risk are exactly the
+unattended ones (gateway, cron, background workers) that most need to report.
+
+For harnesses with a hook system, Agent Center closes that gap with a served
+lifecycle hook. Hermes is the first: `GET /api/v1/hooks/hermes/plugin.py` and its
+`plugin.yaml` are a complete Hermes plugin registering a `pre_llm_call` hook that
+prepends the reporting policy to the **first message of every session** — CLI,
+gateway, cron, and kanban runs alike. Delivery stops being probabilistic.
+
+Three things the hook deliberately does *not* do:
+
+- **Send anything itself.** It only puts text in front of the model, so every
+  card in the feed stays model-authored — no canned "session ended" noise.
+- **Interrupt.** First message of a session, once. No per-turn nudges, no
+  stop-blocking, no re-asks.
+- **Break anything.** It fails open, and `AGENT_CENTER_ENFORCE=off` disables it
+  without uninstalling.
+
+Installing it is part of the normal Hermes flow — the single prompt in
+**Connect an agent** includes it. By hand:
+
+```sh
+mkdir -p ~/.hermes/plugins/agent-center
+curl -o ~/.hermes/plugins/agent-center/__init__.py http://127.0.0.1:8765/api/v1/hooks/hermes/plugin.py
+curl -o ~/.hermes/plugins/agent-center/plugin.yaml http://127.0.0.1:8765/api/v1/hooks/hermes/plugin.yaml
+hermes plugins enable agent-center
+```
+
+`hermes plugins list` should show it enabled; it loads from the next session on.
+To watch it work, make the *first* message of a fresh session "repeat any
+bracketed policy text prepended to this message" — the model quotes the
+`[agent-center]` block back. (`hermes hooks list`/`test` covers shell hooks only,
+so the plugin correctly does not appear there.)
+
+Only Hermes has a hook today. Other harnesses get the same treatment as their
+hook systems allow, under the same `/api/v1/hooks/<harness>/` layout — see
+[`agent_center/hooks/README.md`](agent_center/hooks/README.md).
 
 ## The notification model
 
@@ -229,8 +294,9 @@ See [clients/macos/README.md](clients/macos/README.md).
 
 Early, and deliberately narrow: one-way visibility is the whole scope, now and later.
 On the roadmap: SSE live updates (the UI polls every 30s today; `/facets` answers 304
-when nothing changed), snooze/mute rules, per-harness lifecycle hooks so a run cannot
-finish silently, and Web Push for `urgent`. Not on the roadmap: replies, approvals,
+when nothing changed), snooze/mute rules, session hooks for more harnesses (Hermes
+ships today; Claude Code next) plus stronger opt-in enforcement modes for them, and
+Web Push for `urgent`. Not on the roadmap: replies, approvals,
 or anything that would make this a place work happens rather than a place work is
 reported.
 
