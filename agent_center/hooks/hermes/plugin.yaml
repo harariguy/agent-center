@@ -1,0 +1,11 @@
+name: agent-center
+version: "0.1.0"
+description: >
+  Injects the Agent Center reporting policy in front of the first message of
+  every session, so the agent reports what it did — and what needs the user —
+  without being asked. Injection only: the hook never sends anything itself,
+  every notification stays model-authored. Set AGENT_CENTER_ENFORCE=off to
+  disable without uninstalling.
+author: Agent Center
+provides_hooks:
+  - pre_llm_call

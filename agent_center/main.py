@@ -20,7 +20,7 @@ from .config import Settings
 from .core.ratelimit import RateLimiter
 from .core.retention import prune
 from .db.session import init_db, make_engine, make_session_factory
-from .docs import GUIDE, skill
+from .docs import GUIDE, HERMES_PLUGIN_YAML, hermes_plugin, skill
 from .errors import PROBLEM_TYPE, install_handlers
 from .mcp import router as mcp_router
 
@@ -197,6 +197,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def skill_md(request: Request):
         return PlainTextResponse(skill(str(request.base_url)),
                                  media_type="text/markdown; charset=utf-8")
+
+    # Per-harness lifecycle hooks, ungated like the skill. The skill only works
+    # when the harness's skill scan surfaces it; a hook puts the policy in front
+    # of the first message of every session, so delivery stops depending on that
+    # scan. The served text carries no secrets — the agent's token stays in its
+    # own MCP config.
+    @app.get("/api/v1/hooks/hermes/plugin.py", tags=["meta"],
+             response_class=PlainTextResponse)
+    def hermes_hook_plugin(request: Request):
+        return PlainTextResponse(hermes_plugin(str(request.base_url)),
+                                 media_type="text/x-python; charset=utf-8")
+
+    @app.get("/api/v1/hooks/hermes/plugin.yaml", tags=["meta"],
+             response_class=PlainTextResponse)
+    def hermes_hook_manifest():
+        return PlainTextResponse(HERMES_PLUGIN_YAML,
+                                 media_type="text/yaml; charset=utf-8")
 
     @app.get("/llms.txt", include_in_schema=False, response_class=PlainTextResponse)
     def llms_txt():

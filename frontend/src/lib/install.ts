@@ -13,6 +13,7 @@ export interface InstallContext {
   mcpUrl: string
   guideUrl: string
   skillUrl: string
+  hooksBaseUrl: string
   token: string
   agentName: string
 }
@@ -31,6 +32,10 @@ export interface InstallClient {
   /** Config-driven clients get exact steps; prompt-driven ones get the paste path. */
   kind: "config" | "prompt" | "http"
   steps: (ctx: InstallContext) => InstallStep[]
+  /** Steps that belong after the skill step — e.g. a harness session hook. The
+      order tells the story: MCP is the capability, the skill is the policy, the
+      hook is the guarantee the policy is heard. */
+  finalSteps?: (ctx: InstallContext) => InstallStep[]
 }
 
 export function buildContext(
@@ -44,6 +49,7 @@ export function buildContext(
     mcpUrl: `${baseUrl}/mcp`,
     guideUrl: `${baseUrl}/api/v1/guide.md`,
     skillUrl: `${baseUrl}/api/v1/skill.md`,
+    hooksBaseUrl: `${baseUrl}/api/v1/hooks`,
     token: token ?? TOKEN_PLACEHOLDER,
     agentName,
   }
@@ -86,9 +92,10 @@ Then confirm it by calling report_activity once with group_key "setup-check".`,
   }
 }
 
-/** Every client's steps, plus the skill step that all of them need. */
+/** Every client's steps, plus the skill step that all of them need, plus
+    whatever a harness adds after it (today: the Hermes session hook). */
 export function clientSteps(client: InstallClient, ctx: InstallContext): InstallStep[] {
-  return [...client.steps(ctx), skillStep(ctx)]
+  return [...client.steps(ctx), skillStep(ctx), ...(client.finalSteps?.(ctx) ?? [])]
 }
 
 /** True when the URL only resolves on this machine — agents elsewhere can't reach it. */
@@ -122,6 +129,38 @@ function mcpServersJson(ctx: InstallContext) {
 }`
 }
 
+/** Hermes reads YAML from ~/.hermes/config.yaml, not the mcpServers JSON shape. */
+function hermesConfigYaml(ctx: InstallContext) {
+  return `mcp_servers:
+  agent-center:
+    url: ${ctx.mcpUrl}
+    headers:
+      ${AUTH_HEADER}: ${bearer(ctx)}`
+}
+
+/** The Hermes session hook: guaranteed policy delivery, model-authored content.
+ *
+ * The skill only works when Hermes' skill scan surfaces it. This plugin injects
+ * the reporting policy in front of the first message of every session — CLI,
+ * gateway, cron, and kanban runs alike — so delivery stops depending on that
+ * scan. Injection only: the hook never sends anything itself, every notification
+ * stays written by the agent. Rendered after the skill step because that is the
+ * story's order: capability (MCP), policy (skill), guarantee (hook). */
+export function hermesEnforcementStep(ctx: InstallContext): InstallStep {
+  return {
+    title: "Make the policy load every session",
+    detail:
+      "Already included in the single prompt above — paste this only if you " +
+      "configured by hand. A skill can be missed by the skill scan; this Hermes " +
+      "plugin puts the reporting policy in front of the first message of every " +
+      "session. It only injects text — every notification stays written by the agent.",
+    codeLabel: "Prompt",
+    code: `${hermesHookInstructions(ctx)}
+
+Then confirm the setup by calling report_activity once with group_key "setup-check".`,
+  }
+}
+
 /** VS Code names the same thing "servers" rather than "mcpServers". */
 function vscodeJson(ctx: InstallContext) {
   return `{
@@ -137,42 +176,65 @@ function vscodeJson(ctx: InstallContext) {
 }`
 }
 
+/** The Hermes session-hook instructions, shared by the single-prompt path and
+    the step-by-step path so the two can never drift apart. Written to work both
+    as a numbered step in `installPrompt` and as a standalone paste. */
+function hermesHookInstructions(ctx: InstallContext): string {
+  return `Install the Agent Center session hook, so every one of your sessions
+   starts with the reporting policy already in context:
+   - fetch ${ctx.hooksBaseUrl}/hermes/plugin.py and write it to
+     ~/.hermes/plugins/agent-center/__init__.py
+   - fetch ${ctx.hooksBaseUrl}/hermes/plugin.yaml and write it to
+     ~/.hermes/plugins/agent-center/plugin.yaml
+   - run: hermes plugins enable agent-center
+   - check that \`hermes plugins list\` shows agent-center as enabled; the
+     plugin loads from your next session on.`
+}
+
 /** The universal installer: one block to paste at any agent that can edit its
     own config or call HTTP. Carries the credentials, the tool names, and a
-    pointer at the served guide rather than a copy of it. */
-export function installPrompt(ctx: InstallContext): string {
-  return `Please connect yourself to my Agent Center so you can send me notifications.
-
-This is a notification layer only. It does not change how you work, it is not a
-channel anyone replies through, and nothing waits on it — you just report what you
-did and what needs me.
-
-1. Add this MCP server to your configuration:
+    pointer at the served guide rather than a copy of it. A harness with extra
+    setup (Hermes' session hook) passes it as `extraSteps`; the confirmation is
+    always the last step. */
+export function installPrompt(ctx: InstallContext, extraSteps: string[] = []): string {
+  const steps = [
+    `Add this MCP server to your configuration:
    - transport: streamable HTTP
    - name: agent-center
    - url: ${ctx.mcpUrl}
    - header: ${AUTH_HEADER}: ${bearer(ctx)}
 
    If you cannot add an MCP server, you can POST to ${ctx.baseUrl}/api/v1/notifications
-   with that same Authorization header instead.
+   with that same Authorization header instead.`,
 
-2. It gives you four tools: report_activity (something happened, no reply needed),
+    `It gives you four tools: report_activity (something happened, no reply needed),
    request_input (you are blocked and need me), list_open_notifications, and
-   resolve_notification (clear something once it no longer needs me).
+   resolve_notification (clear something once it no longer needs me).`,
 
-3. Read ${ctx.guideUrl} and follow it. The short version: always send a stable
+    `Read ${ctx.guideUrl} and follow it. The short version: always send a stable
    group_key naming the thing rather than the run, write every notification as a
    complete snapshot instead of a delta, and only use request_input when you have
-   actually stopped.
+   actually stopped.`,
 
-4. Fetch ${ctx.skillUrl} and install it as a skill in your own skill directory
+    `Fetch ${ctx.skillUrl} and install it as a skill in your own skill directory
    (e.g. ~/.claude/skills/agent-center/SKILL.md or
    ~/.hermes/skills/productivity/agent-center/SKILL.md). This is the step
    that makes you report on your own instead of waiting to be asked, so do not
-   skip it, and keep the frontmatter's description and triggers intact.
+   skip it, and keep the frontmatter's description and triggers intact.`,
 
-5. Confirm it works by calling report_activity with group_key "setup-check",
-   type "agent.connected", and a title saying you are connected.`
+    ...extraSteps,
+
+    `Confirm it works by calling report_activity with group_key "setup-check",
+   type "agent.connected", and a title saying you are connected.`,
+  ]
+
+  return `Please connect yourself to my Agent Center so you can send me notifications.
+
+This is a notification layer only. It does not change how you work, it is not a
+channel anyone replies through, and nothing waits on it — you just report what you
+did and what needs me.
+
+${steps.map((s, i) => `${i + 1}. ${s}`).join("\n\n")}`
 }
 
 export const CLIENTS: InstallClient[] = [
@@ -284,16 +346,24 @@ export const CLIENTS: InstallClient[] = [
     steps: (ctx) => [
       {
         title: "Paste this as a single prompt",
-        detail: "Works with any harness that can add its own tools or call HTTP.",
+        detail:
+          "One paste does everything: Hermes wires up the MCP server, reads the " +
+          "guide, installs the skill and the session hook, and confirms here.",
         codeLabel: "Prompt",
-        code: installPrompt(ctx),
+        code: installPrompt(ctx, [hermesHookInstructions(ctx)]),
       },
       {
         title: "Or configure it by hand",
-        codeLabel: "mcp.json",
-        code: mcpServersJson(ctx),
+        detail:
+          "Hermes reads YAML from ~/.hermes/config.yaml — merge this in, keeping any " +
+          "servers already listed. (`hermes mcp add agent-center --url " +
+          `${ctx.mcpUrl}` +
+          " --auth header` does the same interactively.) Then walk the two steps below.",
+        codeLabel: "~/.hermes/config.yaml",
+        code: hermesConfigYaml(ctx),
       },
     ],
+    finalSteps: (ctx) => [hermesEnforcementStep(ctx)],
   },
   {
     id: "any-mcp",
